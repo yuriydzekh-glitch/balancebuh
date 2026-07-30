@@ -767,12 +767,7 @@
         </div>
       </div>
 
-      <form id="leadForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-        <!-- потрібно для розпізнавання форми Netlify -->
-        <input type="hidden" name="form-name" value="contact">
-        <!-- honeypot проти спам-ботів -->
-        <p style="display:none;"><label>Не заповнюйте це поле: <input name="bot-field"></label></p>
-
+      <form id="leadForm" method="POST">
         <div class="form-group">
           <label for="f-name">Ім'я</label>
           <input id="f-name" name="name" type="text" placeholder="Як до вас звертатись" required>
@@ -815,7 +810,8 @@
     }
   }
 
-  // Відправка форми заявки без перезавантаження сторінки (Netlify Forms)
+  // Відправка заявки на Cloudflare Pages Function /submit,
+  // яка пересилає повідомлення в Telegram
   const leadForm = document.getElementById('leadForm');
   const formStatus = document.getElementById('formStatus');
 
@@ -829,12 +825,13 @@
 
       const formData = new FormData(leadForm);
 
-      fetch('/', {
+      fetch('/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(formData).toString()
+        body: formData
       })
-        .then(() => {
+        .then((res) => res.json())
+        .then((data) => {
+          if (!data.ok) throw new Error(data.error || 'unknown error');
           formStatus.textContent = 'Дякуємо! Ваша заявка надіслана — ми зв\'яжемось із вами найближчим часом.';
           formStatus.className = 'form-status ok';
           leadForm.reset();
