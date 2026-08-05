@@ -487,7 +487,7 @@
       <a href="#why">Чому ми</a>
       <a href="#contact">Контакти</a>
     </nav>
-    <a href="#contact" class="nav-cta" onclick="trackConversion('header_cta')">Отримати консультацію</a>
+    <a href="#contact" class="nav-cta">Отримати консультацію</a>
   </div>
 </header>
 
@@ -498,7 +498,7 @@
       <h1>Ваші звіти здані.<br>Ваш час — вільний.</h1>
       <p class="lead">Ведемо бухгалтерію ФОП під ключ: звітність, податки, зарплата. Без штрафів, без дедлайнів у нервах — все під контролем щомісяця.</p>
       <div class="btn-row">
-        <a href="#contact" class="btn btn-primary" onclick="trackConversion('hero_cta')">Замовити консультацію</a>
+        <a href="#contact" class="btn btn-primary">Замовити консультацію</a>
         <a href="#services" class="btn btn-ghost">Переглянути послуги</a>
       </div>
     </div>
@@ -782,7 +782,7 @@
           <label for="f-message">Коротко про бізнес</label>
           <textarea id="f-message" name="message" placeholder="Наприклад: ФОП 3 гр., ІТ-послуги"></textarea>
         </div>
-        <button type="submit" class="form-submit" onclick="trackConversion('form_submit')">Надіслати заявку</button>
+        <button type="submit" class="form-submit">Надіслати заявку</button>
         <div class="form-note">Натискаючи «Надіслати», ви погоджуєтесь на обробку контактних даних для зв'язку з вами.</div>
         <div id="formStatus" class="form-status"></div>
       </form>
@@ -837,6 +837,7 @@
         .then((data) => {
           if (!data.ok) throw new Error(data.error || 'unknown error');
           formStatus.textContent = 'Дякуємо! Ваша заявка надіслана — ми зв\'яжемось із вами найближчим часом.';
+          trackConversion('form_submit');
           formStatus.className = 'form-status ok';
           leadForm.reset();
           submitBtn.textContent = 'Надіслати заявку';
