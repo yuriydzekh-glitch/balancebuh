@@ -455,6 +455,15 @@
     color:#8a948e;
     margin-top:10px;
   }
+  .field-error{
+    font-size:12px;
+    color:#f4a3a3;
+    margin-top:5px;
+    min-height:14px;
+  }
+  .form-group input:invalid:not(:placeholder-shown){
+    border-color:#c85050;
+  }
   .form-status{
     font-size:14px;
     padding:12px 14px;
@@ -772,11 +781,13 @@
       <form id="leadForm" method="POST">
         <div class="form-group">
           <label for="f-name">Ім'я</label>
-          <input id="f-name" name="name" type="text" placeholder="Як до вас звертатись" required>
+          <input id="f-name" name="name" type="text" placeholder="Як до вас звертатись" pattern="[A-Za-zА-Яа-яҐґЄєІіЇї'’\- ]+" title="Тільки літери, без цифр і символів" maxlength="60" required>
+          <div id="f-name-err" class="field-error"></div>
         </div>
         <div class="form-group">
           <label for="f-contact">Телефон або email</label>
-          <input id="f-contact" name="contact" type="text" placeholder="+380... або email" required>
+          <input id="f-contact" name="contact" type="text" placeholder="+380... або email" pattern="(\+?[0-9 \-\(\)]{7,20})|([A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,})" title="Введіть номер телефону (лише цифри) або email" maxlength="60" required>
+          <div id="f-contact-err" class="field-error"></div>
         </div>
         <div class="form-group">
           <label for="f-message">Коротко про бізнес</label>
@@ -817,11 +828,51 @@
   // Відправка заявки на Cloudflare Pages Function /submit,
   // яка пересилає повідомлення в Telegram
   const leadForm = document.getElementById('leadForm');
+
+  // Фільтрація полів форми в реальному часі — не дає ввести неправильні символи.
+  const nameInput = document.getElementById('f-name');
+  const contactInput = document.getElementById('f-contact');
+  const nameErr = document.getElementById('f-name-err');
+  const contactErr = document.getElementById('f-contact-err');
+
+  if (nameInput) {
+    // Дозволені символи: літери (укр/лат), пробіл, дефіс, апостроф
+    nameInput.addEventListener('input', function () {
+      const cleaned = nameInput.value.replace(/[^A-Za-zА-Яа-яҐґЄєІіЇї'’\- ]/g, '');
+      if (cleaned !== nameInput.value) {
+        nameInput.value = cleaned;
+        nameErr.textContent = 'Дозволені лише літери';
+      } else {
+        nameErr.textContent = '';
+      }
+    });
+  }
+
+  if (contactInput) {
+    // Дозволені символи: цифри, +, -, (, ), пробіл (для телефону) АБО символи email
+    contactInput.addEventListener('input', function () {
+      const cleaned = contactInput.value.replace(/[^0-9A-Za-z@.+\-() ]/g, '');
+      if (cleaned !== contactInput.value) {
+        contactInput.value = cleaned;
+        contactErr.textContent = 'Введіть номер телефону або email';
+      } else {
+        contactErr.textContent = '';
+      }
+    });
+  }
+
   const formStatus = document.getElementById('formStatus');
 
   if (leadForm) {
     leadForm.addEventListener('submit', function (e) {
       e.preventDefault();
+
+      // Перевіряємо валідність полів (літери в імені, телефон/email у контакті)
+      // — оскільки preventDefault() вимикає стандартну перевірку браузера.
+      if (!leadForm.checkValidity()) {
+        leadForm.reportValidity();
+        return;
+      }
 
       const submitBtn = leadForm.querySelector('.form-submit');
       submitBtn.disabled = true;
