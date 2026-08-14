@@ -952,6 +952,19 @@
 <script>
   function trackConversion(source) {
     if (typeof gtag === 'function') {
+      // 1) Подія в GA4 (без send_to — летить в усі підключені теги,
+      //    тобто і в G-Y5KCZCNDW2). Завдяки цьому заявка з'явиться
+      //    в GA4 → Звіти в реальному часі → Кількість подій за назвою події,
+      //    і її можна буде позначити як "Ключова подія" та імпортувати
+      //    в Google Ads як конверсію на основі реальних даних GA4.
+      gtag('event', 'generate_lead', {
+        'event_category': 'lead',
+        'event_label': source,
+        'value': 1.0,
+        'currency': 'UAH'
+      });
+
+      // 2) Пряма конверсія в Google Ads (як і раніше).
       gtag('event', 'conversion', {
         'send_to': 'AW-18366043788/61mtCJ360docEIytzrVE',
         'value': 1.0,
